@@ -119,6 +119,20 @@ export class RuleOr extends LogicRule {
     super(funcs)
   }
 
+  async evaluate(parent, args, ctx, info) {
+    const rules = this.getRules()
+    for (const rule of rules) {
+      const result = await rule.resolve(parent, args, ctx, info)
+
+      // * Return early as possible
+      if (result) {
+        return [true]
+      }
+    }
+
+    return [false]
+  }
+
   async resolve(parent, args, ctx, info): Promise<boolean> {
     const res = await this.evaluate(parent, args, ctx, info)
     return res.some(permission => permission)
@@ -130,6 +144,20 @@ export class RuleAnd extends LogicRule {
     super(funcs)
   }
 
+  async evaluate(parent, args, ctx, info) {
+    const rules = this.getRules()
+    for (const rule of rules) {
+      const result = await rule.resolve(parent, args, ctx, info)
+
+      // * Return early as possible
+      if (!result) {
+        return [false]
+      }
+    }
+
+    return [true]
+  }
+
   async resolve(parent, args, ctx, info): Promise<boolean> {
     const res = await this.evaluate(parent, args, ctx, info)
     return res.every(permission => permission)
@@ -139,6 +167,20 @@ export class RuleAnd extends LogicRule {
 export class RuleNot extends LogicRule {
   constructor(func: IRule) {
     super([func])
+  }
+
+  async evaluate(parent, args, ctx, info) {
+    const rules = this.getRules()
+    for (const rule of rules) {
+      const result = await rule.resolve(parent, args, ctx, info)
+
+      // * Return early as possible
+      if (!result) {
+        return [false]
+      }
+    }
+
+    return [true]
   }
 
   async resolve(parent, args, ctx, info): Promise<boolean> {

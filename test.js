@@ -588,7 +588,7 @@ test('shield:Error: AllowExternalErrors error', async t => {
 // Cache:Logic
 
 test('shield:Cache:Logic: All caches', async t => {
-  t.plan(5)
+  t.plan(4)
   const schema = getTestsSchema(t)
   const query = `
     query {
